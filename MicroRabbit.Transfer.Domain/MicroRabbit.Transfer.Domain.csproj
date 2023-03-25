@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="CommandHandlers\" />
+    <Folder Include="Interfaces\" />
     <Folder Include="Events\" />
     <Folder Include="Commands\" />
+    <Folder Include="CommandsHandlers\" />
     <Folder Include="EventHandlers\" />
-    <Folder Include="Interface\" />
-    <Folder Include="Models\" />
+    <Folder Include="Modles\" />
   </ItemGroup>
 
 </Project>
