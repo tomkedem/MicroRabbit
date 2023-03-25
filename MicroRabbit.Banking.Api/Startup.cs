@@ -18,10 +18,10 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 namespace MicroRabbit.Banking.Api
 {
-    public class Startup1
+    public class Startup
     {
         
-            public Startup1(IConfiguration configuration)
+            public Startup(IConfiguration configuration)
             {
                 Configuration = configuration;
             }
@@ -44,7 +44,7 @@ namespace MicroRabbit.Banking.Api
                     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Banking Microservice", Version = "v1" });
                 });
 
-                services.AddMediatR(typeof(Startup1));
+                services.AddMediatR(typeof(Startup));
 
                 RegisterServices(services);
             }

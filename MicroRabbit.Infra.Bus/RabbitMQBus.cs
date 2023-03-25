@@ -2,6 +2,7 @@
 using MicroRabbit.Domain.Core.Bus;
 using MicroRabbit.Domain.Core.Commands;
 using MicroRabbit.Domain.Core.Events;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -11,16 +12,18 @@ namespace MicroRabbit.Infra.Bus
 {
     public sealed class RabbitMQBus : IEventBus
     {
-        
+        private readonly IMediator _mediator;
         private readonly Dictionary<string, List<Type>> _handler;
         private readonly List<Type> _eventTypes;
-        private readonly IMediator _mediator;
         
-        public RabbitMQBus(IMediator mediator)
+        private readonly IServiceScopeFactory _serviceScopeFactory;
+
+        public RabbitMQBus(IMediator mediator, IServiceScopeFactory serviceScopeFactory)
         {
             _mediator = mediator;
             _handler = new Dictionary<string, List<Type>>();
-            _eventTypes = new List<Type>(); 
+            _eventTypes = new List<Type>();
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         public Task SendCommand<T>(T command) where T : Command
@@ -62,7 +65,7 @@ namespace MicroRabbit.Infra.Bus
                 _handler.Add(eventName, new List<Type>());
             }
 
-            if (!_handler[eventName].Any(s => s.GetType() == handlerType))
+            if (_handler[eventName].Any(s => s.GetType() == handlerType))
             {
                 throw new ArgumentOutOfRangeException(
                     @"Handler Type {handlerType.Name} alredy is registered for {eventName}", nameof(handlerType));                    
@@ -113,16 +116,20 @@ namespace MicroRabbit.Infra.Bus
         {
             if(_handler.ContainsKey(eventName))
             {
-                var subscriptions = _handler[eventName];
-                foreach (var subscription in subscriptions)
+                using (var scop = _serviceScopeFactory.CreateScope())
                 {
-                    var handler = Activator.CreateInstance(subscription);
-                    if (handler != null) continue;
-                    var eventType = _eventTypes.SingleOrDefault(t => t.Name == eventName);  
-                    var @event = JsonConvert.DeserializeObject(message, eventType);
-                    var conreteType = typeof(IEventHandler<>).MakeGenericType(eventType);
-                    await (Task)conreteType.GetMethod("Handle").Invoke(handler, new object[] { @event });
+                    var subscriptions = _handler[eventName];
+                    foreach (var subscription in subscriptions)
+                    {
+                        var handler = scop.ServiceProvider.GetService(subscription);
+                        if (handler == null) continue;
+                        var eventType = _eventTypes.SingleOrDefault(t => t.Name == eventName);
+                        var @event = JsonConvert.DeserializeObject(message, eventType);
+                        var conreteType = typeof(IEventHandler<>).MakeGenericType(eventType);
+                        await (Task)conreteType.GetMethod("Handle").Invoke(handler, new object[] { @event });
+                    }
                 }
+                
             }
         }
     }

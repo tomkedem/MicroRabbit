@@ -18,7 +18,7 @@ public class Program
 
     public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
         WebHost.CreateDefaultBuilder(args)
-            .UseStartup<MicroRabbit.Banking.Api.Startup1>();
+            .UseStartup<MicroRabbit.Banking.Api.Startup>();
 }
 
 //var builder = WebApplication.CreateBuilder(args);
