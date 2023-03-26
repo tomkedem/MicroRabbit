@@ -29,13 +29,11 @@ namespace MicroRabbit.Transfer.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("FromAccount")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("FromAccount")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("ToAccount")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("ToAccount")
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("TransferAmount")
                         .HasColumnType("numeric");

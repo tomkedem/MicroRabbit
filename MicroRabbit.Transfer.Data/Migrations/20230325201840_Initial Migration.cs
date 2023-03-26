@@ -17,8 +17,8 @@ namespace MicroRabbit.Transfer.Data.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FromAccount = table.Column<string>(type: "text", nullable: false),
-                    ToAccount = table.Column<string>(type: "text", nullable: false),
+                    FromAccount = table.Column<int>(type: "integer", nullable: false),
+                    ToAccount = table.Column<int>(type: "integer", nullable: false),
                     TransferAmount = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
